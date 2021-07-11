@@ -1,3 +1,5 @@
 {
-  "exec": "npm run lint && node server.js "
+  "exec": "npm run lint && node server.js",
+  "watch": ["components/", "views/"],
+  "ext": "js, css, html, json"
 }

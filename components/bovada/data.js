@@ -14,6 +14,7 @@ const MLBLINES = {
  * Grab the games from Bovada
  * @param {string} html
  * @param {string} gamesRowQuery
+ * @return {array} games
  */
 function getGames(html, gamesRowQuery) {
   const dom = cheerio.load(html);
@@ -38,10 +39,12 @@ function getGames(html, gamesRowQuery) {
           gameData = parseGameData(domEventSection, k);
           games.push(gameData);
         }
-        console.log(games);
+        // console.log(games);
       }
     }
   }
+
+  return games;
 }
 
 /**
@@ -56,6 +59,7 @@ function parseGameData(domEventSection, index) {
   const marketLine = domEventSection.eq(index).find('.market-line');
   const betPrice = domEventSection.eq(index).find('.bet-price');
   const totalOutcome = domEventSection.eq(index).find('sp-total-outcome');
+  const score = domEventSection.eq(index).find('.score-nr');
   const gameTime = domEventSection.eq(index).find('.gs').eq(0).text();
   const team1 = compName.eq(0).text();
   const team2 = compName.eq(1).text();
@@ -73,6 +77,10 @@ function parseGameData(domEventSection, index) {
   gameData.totalOutcome = {
     team1: totalOutcome.eq(0).find('.both-handicaps').text(),
     team2: totalOutcome.eq(1).find('.both-handicaps').text(),
+  };
+  gameData.score = {
+    team1: score.eq(0).text(),
+    team2: score.eq(1).text(),
   };
 
   return gameData;

@@ -4,6 +4,8 @@ const path = require('path');
 const mustacheExpress = require('mustache-express');
 const bodyParser = require('body-parser');
 const app = express();
+const http = require('http').Server(app);
+const io = require('socket.io')(http);
 
 bole.output({level: 'debug', stream: process.stdout});
 const log = bole('server');
@@ -28,9 +30,10 @@ app.use(express.static('public'));
 app.use(express.static('node_modules/bootstrap/dist'));
 
 // Home Page
-app.use(require('./components/home/index.js'));
+app.use(require('./components/home/index.js')(io));
 
 module.exports = {
   app: app,
+  http: http,
   log: log,
 };
