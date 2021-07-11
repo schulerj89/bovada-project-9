@@ -11,12 +11,17 @@
       .container {
         margin-top: 20px;
       }
+      .incoming {
+        color: green;
+        font-weight: bold;
+      }
       .gametime {
         padding-top: 10px;
         border-right: 1px solid;
         text-align: center;
         background: aquamarine;
       }
+      .hide {display: none;}
       .score {
         border-left: 1px solid black;
         border-right: 1px solid black;
@@ -24,8 +29,21 @@
         background: gold;
         font-weight: bold;
       }
+      .teamname {
+        font-weight: bold;
+        border-bottom: 1px solid black;
+      }
+      .border-bottom {
+        border-bottom: 1px solid black !important;
+      }
+      .team {
+        padding: 10px;
+      }
       .border-right {
         border-right: 1px solid black;
+      }
+      .no-padding {
+        padding: 0;
       }
     </style>
   </head>
@@ -35,38 +53,66 @@
 
       setInterval(function() {
             socket.emit('UpdateGames');
-        }, 20000);
+            jQuery('.incoming').removeClass('hide');
+        }, 60000);
 
         socket.on('UpdateStats', function(data){
             var players = data.gamelines;
-            jQuery('.games').html('');
+
+            if(players.length > 0) {
+              jQuery('.games').html('');
+            }
+
             for(var i = 0; i < players.length; i++) {
+                var gameStatsHTML = '';
+                var gameStats = '';
+                var gameStats2 = '';
+
+                if(players[i].gameData !== undefined) {
+                  gameStats += '<div class="col-5 team"><div class="teamname">' + players[i].team1 + '</div>';
+                  for(var j = 0; j < players[i].gameData.team1.length; j++) {
+                    gameStats += '<div>' + players[i].gameData.team1[j].name + ' ' + players[i].gameData.team1[j].stats +'</div>';
+                  }
+                  gameStats += '</div>';
+
+                  gameStats2 += '<div class="col-5 team"><div class="teamname">' + players[i].team2 + '</div>';
+                  for(var j = 0; j < players[i].gameData.team2.length; j++) {
+                    gameStats2 += '<div>' + players[i].gameData.team2[j].name + ' ' + players[i].gameData.team2[j].stats +'</div>';
+                  }
+                  gameStats2 += '</div>';
+
+                  gameStatsHTML += '<div class="row"><div class="col-2"></div>' + gameStats + gameStats2 + '</div>';
+                }
+
                 var html = '<div class="row">';
                 html += ' \
                 <div class="col-2 gametime">' + players[i].gameTime + '</div> \
-                  <div class="col-1 score text-center"> \
-                    <div class="col">' + players[i].score.team1 + '</div> \
+                  <div class="col-1 score text-center no-padding"> \
+                    <div class="col border-bottom">' + players[i].score.team1 + '</div> \
                     <div class="col">' + players[i].score.team2 + '</div> \
                   </div> \
-                  <div class="col-3 border-right"> \
-                    <div class="col">' + players[i].team1 + '</div> \
-                    <div class="col">' + players[i].team2 + '</div> \
+                  <div class="col-3 border-right no-padding"> \
+                    <div class="col border-bottom text-center">' + players[i].team1 + '</div> \
+                    <div class="col text-center">' + players[i].team2 + '</div> \
                   </div> \
-                  <div class="col-2 lines text-center border-right"> \
-                    <div class="col">' + players[i].marketLine.team1 + '</div> \
+                  <div class="col-2 lines text-center border-right no-padding"> \
+                    <div class="col border-bottom">' + players[i].marketLine.team1 + '</div> \
                     <div class="col">' + players[i].marketLine.team2 + '</div> \
                   </div> \
-                  <div class="col-2 betprice text-center border-right"> \
-                    <div class="col">' + players[i].betPrice.team1 + '</div> \
+                  <div class="col-2 betprice text-center border-right no-padding"> \
+                    <div class="col border-bottom">' + players[i].betPrice.team1 + '</div> \
                     <div class="col">' + players[i].betPrice.team2 + '</div> \
                   </div> \
-                  <div class="col-2 total text-center"> \
-                    <div class="col">' + players[i].totalOutcome.team1 + '</div> \
+                  <div class="col-2 total text-center no-padding"> \
+                    <div class="col border-bottom">' + players[i].totalOutcome.team1 + '</div> \
                     <div class="col">' + players[i].totalOutcome.team2 + '</div> \
                   </div> \
                 ';
-                jQuery('.games').prepend(html);
+                html += '</div>';
+                html += gameStatsHTML;
+                jQuery('.games').append(html);
             }
+            jQuery('.incoming').addClass('hide');
             jQuery(".fade-it").delay(150).animate({
                 "background-color": "#fc9"
             }, 350, function () {
@@ -78,30 +124,46 @@
    </script>
   <body>
     <div class="container">
-      <div><h3>MLB GAMES</h3></div>
+      <div><h3>LIVE MLB GAMES</h3></div>
+      <div class="hide incoming">Updates Incoming</div>
       <div class="games fade-it">
         {{#gamelines}}
         <div class="row">
           <div class="col-2 gametime">{{gameTime}}</div>
-          <div class="col-1 score text-center">
-            <div class="col">{{score.team1}}</div>
+          <div class="col-1 score text-center no-padding">
+            <div class="col border-bottom">{{score.team1}}</div>
             <div class="col">{{score.team2}}</div>
           </div>
-          <div class="col-3 border-right">
-            <div class="col">{{team1}}</div>
-            <div class="col">{{team2}}</div>
+          <div class="col-3 border-right no-padding">
+            <div class="col border-bottom text-center">{{team1}}</div>
+            <div class="col text-center">{{team2}}</div>
           </div>
-          <div class="col-2 lines text-center border-right">
-            <div class="col">{{marketLine.team1}}</div>
+          <div class="col-2 lines text-center border-right no-padding">
+            <div class="col border-bottom">{{marketLine.team1}}</div>
             <div class="col">{{marketLine.team2}}</div>
           </div>
-          <div class="col-2 betprice text-center border-right">
-            <div class="col">{{betPrice.team1}}</div>
+          <div class="col-2 betprice text-center border-right no-padding">
+            <div class="col border-bottom">{{betPrice.team1}}</div>
             <div class="col">{{betPrice.team2}}</div>
           </div>
-          <div class="col-2 total text-center">
-            <div class="col">{{totalOutcome.team1}}</div>
+          <div class="col-2 total text-center no-padding">
+            <div class="col border-bottom">{{totalOutcome.team1}}</div>
             <div class="col">{{totalOutcome.team2}}</div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-2"></div>
+          <div class="col-5 team">
+            <div class="teamname">{{team1}}</div>
+            {{#gameData.team1}}
+            <div>{{name}} {{stats}}</div>
+            {{/gameData.team1}}
+          </div>
+          <div class="col-5 team">
+            <div class="teamname">{{team2}}</div>
+            {{#gameData.team2}}
+            <div>{{name}} {{stats}}</div>
+            {{/gameData.team2}}
           </div>
         </div>
         {{/gamelines}}

@@ -1,7 +1,9 @@
+const console = require('console');
 const {cheerio, getHTML} = require('../html/dom-html');
 
 const MLBLINES = {
   getMLBLines: async () => {
+    console.log('Grab Bovada');
     const url = 'https://www.bovada.lv/sports/baseball';
     const html = await getHTML(url);
     const games = getGames(html, '.happening-now-bucket');
@@ -41,6 +43,8 @@ function getGames(html, gamesRowQuery) {
         }
         // console.log(games);
       }
+
+      break;
     }
   }
 
@@ -57,7 +61,8 @@ function parseGameData(domEventSection, index) {
   const gameData = {};
   const compName = domEventSection.eq(index).find('.competitor-name .name');
   const marketLine = domEventSection.eq(index).find('.market-line');
-  const betPrice = domEventSection.eq(index).find('.bet-price');
+  const twoWay = domEventSection.eq(index).find('sp-two-way-vertical');
+  const betPrice = twoWay.eq(1).find('sp-outcome .bet-price');
   const totalOutcome = domEventSection.eq(index).find('sp-total-outcome');
   const score = domEventSection.eq(index).find('.score-nr');
   const gameTime = domEventSection.eq(index).find('.gs').eq(0).text();

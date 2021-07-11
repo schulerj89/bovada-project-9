@@ -1,11 +1,13 @@
 const createBrowserless = require('browserless');
 const cheerio = require('cheerio');
+const console = require('console');
 
 /**
  * Get HTML from provided URL
  * @param {string} url
  */
 async function getHTML(url) {
+  console.log('Grabbing ' + url);
   // First, create a browserless factory
   // that it will keep a singleton process running
   const browserlessFactory = createBrowserless();
@@ -21,7 +23,9 @@ async function getHTML(url) {
   await browserless.destroyContext();
 
   // At the end, gracefully shutdown the browser process
-  await browserlessFactory.close();
+  const pid = await browserlessFactory.close();
+
+  console.log(pid);
 
   return html;
 }

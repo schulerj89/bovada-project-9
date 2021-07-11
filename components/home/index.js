@@ -5,6 +5,7 @@ const {MLBGAMES} = require('../games/data');
 
 module.exports = (io) => {
   app.get('/', async (req, res) => {
+    console.log('Getting Games From Server');
     const gamedata = await MLBGAMES.getData();
     console.log(gamedata.gameLines);
     res.render('home/index', {
@@ -17,8 +18,9 @@ module.exports = (io) => {
       console.log('A user connected');
 
       socket.on('UpdateGames', async () => {
+        console.log('Getting Games From Client');
         const data = await MLBGAMES.getData();
-        console.log('I heard ya!');
+        console.log('We are done');
         io.sockets.emit('UpdateStats', {gamelines: data.gameLines});
       });
 
